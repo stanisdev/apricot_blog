@@ -5,11 +5,11 @@ class Auth {
     this.prefix = '/auth';
   }
 
-  ['GET /register'](req, res) {
+  async ['POST /register | <*>']({ req, res }) {
     res.json({ success: true });
   }
 
-  ['POST /login']() {}
+  ['POST /login <*>']() {}
 }
 
 module.exports = Auth;

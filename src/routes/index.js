@@ -1,7 +1,9 @@
 'use strict';
 
 const { config } = global;
-const app = require(config.components.services + '/app.js');
+const app = require(config.components.services + '/app');
+const wrapper = require(config.components.services + '/wrapper');
+const middlewares = app.get('middlewares');
 const glob = require('glob');
 
 class Route {
@@ -42,8 +44,39 @@ class Route {
   #handler(route) {
     const { Class } = this;
     const fn = Class.prototype[route];
+    if (route.includes('|')) {
+      this.route = route;
+      this.#middleware();
+      this.#validator();
+    }
 
-    app[this.method](this.url, fn);
+    app[this.method](this.url, wrapper(fn));
+  }
+
+  #middleware() {
+    const search = /\|([a-z\d\s,]+)(\<|$)/i.exec(this.route);
+    if (!Array.isArray(search)) {
+      return;
+    }
+    const pattern = search[1].trim();
+    if (pattern.length < 1) {
+      return;
+    }
+    let values = [];
+
+    if (pattern.includes(',')) {
+      values.push(...pattern.split(/\s*,\s*/));
+    } else {
+      values.push(pattern);
+    }
+  }
+
+  #validator() {
+    const search = /\<([^\>]+)\>/.exec(this.route);
+    if (!Array.isArray(search)) {
+      return;
+    }
+    const validator = search[1];
   }
 
   #prefix() {

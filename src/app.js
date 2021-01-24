@@ -3,6 +3,7 @@
 const config = require('./config');
 global.config = config;
 
+require(config.components.middlewares);
 require(config.components.routes);
 const app = require(config.components.services + '/app.js');
 
