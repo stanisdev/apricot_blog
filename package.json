@@ -1,0 +1,28 @@
+{
+  "name": "apricot_blog",
+  "version": "0.0.1",
+  "description": "A REST API of the full-fledged classical blog that involves nearly all standard tools",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stanisdev/apricot_blog.git"
+  },
+  "keywords": [
+    "node",
+    "blog",
+    "postgresql",
+    "sequelize"
+  ],
+  "author": "Stanislav Zavalishin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stanisdev/apricot_blog/issues"
+  },
+  "homepage": "https://github.com/stanisdev/apricot_blog#readme",
+  "dependencies": {
+    "express": "4.17.1",
+    "glob": "7.1.6"
+  }
+}
