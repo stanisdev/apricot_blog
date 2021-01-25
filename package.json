@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "A REST API of the full-fledged classical blog that involves nearly all standard tools",
   "scripts": {
+    "dev": "NODE_ENV=development DB_USERNAME=apricot DB_NAME=apricot_blog nodemon src/app.js",
     "lint": "eslint src/ --fix"
   },
   "repository": {
@@ -23,9 +24,13 @@
   "homepage": "https://github.com/stanisdev/apricot_blog#readme",
   "dependencies": {
     "express": "4.17.1",
-    "glob": "7.1.6"
+    "glob": "7.1.6",
+    "pg": "8.5.1",
+    "pg-hstore": "2.3.3",
+    "sequelize": "6.4.0"
   },
   "devDependencies": {
-    "eslint": "^7.18.0"
+    "eslint": "^7.18.0",
+    "sequelize-cli": "6.2.0"
   }
 }

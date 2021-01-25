@@ -1,7 +1,7 @@
 'use strict';
 
 const { config } = global;
-const app = require(config.components.services + '/app');
+const app = require(config.directory.services + '/app');
 const glob = require('glob');
 const { parse } = require('path');
 

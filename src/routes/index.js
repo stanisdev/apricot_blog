@@ -1,8 +1,8 @@
 'use strict';
 
 const { config } = global;
-const app = require(config.components.services + '/app');
-const wrapper = require(config.components.services + '/wrapper');
+const app = require(config.directory.services + '/app');
+const wrapper = require(config.directory.services + '/wrapper');
 const middlewares = app.get('middlewares');
 const glob = require('glob');
 

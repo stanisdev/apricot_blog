@@ -7,9 +7,9 @@ const srcDir = parse(__dirname).dir;
 const port = Number.parseInt(env.PORT);
 
 const config = Object.seal({
-  components: {
+  directory: {
     src: srcDir,
-    models: join(srcDir, 'models'),
+    db: join(srcDir, 'db'),
     routes: join(srcDir, 'routes'),
     middlewares: join(srcDir, 'middlewares'),
     services: join(srcDir, 'services'),

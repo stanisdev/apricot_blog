@@ -1,13 +1,28 @@
 'use strict';
 
 const config = require('./config');
+const { port } = config.app;
 global.config = config;
 
-require(config.components.middlewares);
-require(config.components.routes);
-const app = require(config.components.services + '/app.js');
+const components = [
+  config.directory.db,
+  config.directory.middlewares,
+  config.directory.routes,
+];
 
-const { port } = config.app;
-app.listen(port, () => {
-  console.log(`The server is listening on port ${port}`);
-});
+async function start() {
+  for (let a = 0; a < components.length; a++) {
+    const component = require(components[a]);
+
+    if (typeof component == 'function') {
+      await component();
+    }
+  }
+  const app = require(config.directory.services + '/app.js');
+
+  app.listen(port, () => {
+    console.log(`The server is listening on port ${port}`);
+  });
+}
+
+start();
