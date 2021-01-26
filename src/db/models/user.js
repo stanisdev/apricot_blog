@@ -17,7 +17,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        isEmail: true,
+        len: 60
+      }
     },
     password: {
       type: DataTypes.STRING,
@@ -28,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     state: {
-      type: Sequelize.SMALLINT,
+      type: DataTypes.SMALLINT,
       defaultValue: 0
     }
   }, {

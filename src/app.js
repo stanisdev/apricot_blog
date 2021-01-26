@@ -7,6 +7,8 @@ global.config = config;
 const components = [
   config.directory.db,
   config.directory.middlewares,
+  config.directory.services + '/logger.js',
+  config.directory.validators,
   config.directory.routes,
 ];
 

@@ -13,6 +13,7 @@ const config = Object.seal({
     routes: join(srcDir, 'routes'),
     middlewares: join(srcDir, 'middlewares'),
     services: join(srcDir, 'services'),
+    validators: join(srcDir, 'validators'),
   },
   app: {
     port: Number.isInteger(port) ? port : 3000,

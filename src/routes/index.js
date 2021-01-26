@@ -4,7 +4,12 @@ const { config } = global;
 const app = require(config.directory.services + '/app');
 const wrapper = require(config.directory.services + '/wrapper');
 const middlewares = app.get('middlewares');
+const validators = app.get('validators');
+const { parse } = require('path');
 const glob = require('glob');
+
+const Ajv = require('ajv');
+const ajv = new Ajv();
 
 class Route {
   constructor() {
@@ -20,6 +25,7 @@ class Route {
         return;
       }
       this.Class = Class;
+      this.fileName = parse(file).name;
       this.#routes();
     }
   }
@@ -44,13 +50,23 @@ class Route {
   #handler(route) {
     const { Class } = this;
     const fn = Class.prototype[route];
+    const handlers = [];
+    
     if (route.includes('|')) {
       this.route = route;
       this.#middleware();
-      this.#validator();
+      handlers.push(
+        this.#validators()
+      );
     }
+    handlers.push(fn);
 
-    app[this.method](this.url, wrapper(fn));
+    app[this.method](
+      this.url,
+      handlers
+        .filter(h => typeof h == 'function')
+        .map(h => wrapper(h))
+    );
   }
 
   #middleware() {
@@ -71,12 +87,39 @@ class Route {
     }
   }
 
-  #validator() {
+  #validators() {
     const search = /\<([^\>]+)\>/.exec(this.route);
     if (!Array.isArray(search)) {
       return;
     }
     const validator = search[1];
+    if (validator == '*') {
+      const url = this.route.split(' ')[1].slice(1);
+      const schemas = validators[this.fileName][url];
+
+      if (!(schemas instanceof Object)) {
+        throw new Error(
+          'The schema for the route ' +
+          this.route +
+          'is not defined'
+        );
+      }
+      return async ({ req, res }) => {
+        Object
+          .entries(schemas)
+          .forEach(([method, schema]) => {
+            schema.type = 'object';
+  
+            const validate = ajv.compile(schema);
+  
+            const data = req[method];
+            const valid = validate(data);
+        
+            console.log(valid);
+            console.log(validate.errors);
+          });
+      };
+    }
   }
 
   #prefix() {
