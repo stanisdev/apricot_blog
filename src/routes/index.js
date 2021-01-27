@@ -1,8 +1,10 @@
 'use strict';
 
 const { config } = global;
-const app = require(config.directory.services + '/app');
-const wrapper = require(config.directory.services + '/wrapper');
+const app = require(config.services.app);
+const wrapper = require(config.services.wrapper);
+const Errorify = require(config.services.errorify);
+
 const middlewares = app.get('middlewares');
 const validators = app.get('validators');
 const { parse } = require('path');
@@ -50,7 +52,7 @@ class Route {
   #handler(route) {
     const { Class } = this;
     const fn = Class.prototype[route];
-    const handlers = [];
+    let handlers = [];
     
     if (route.includes('|')) {
       this.route = route;
@@ -60,12 +62,18 @@ class Route {
       );
     }
     handlers.push(fn);
+    handlers = handlers
+      .filter(h => typeof h == 'function')
+      .map(h => {
+        if (h.toString().includes('async ')) {
+          return wrapper(h);
+        }
+        return h;
+      });
 
     app[this.method](
       this.url,
       handlers
-        .filter(h => typeof h == 'function')
-        .map(h => wrapper(h))
     );
   }
 
@@ -104,19 +112,25 @@ class Route {
           'is not defined'
         );
       }
-      return async ({ req, res }) => {
+      return (req, res, next) => {
         Object
           .entries(schemas)
           .forEach(([method, schema]) => {
             schema.type = 'object';
   
             const validate = ajv.compile(schema);
-  
             const data = req[method];
-            const valid = validate(data);
         
-            console.log(valid);
-            console.log(validate.errors);
+            let error;
+            if (!validate(data)) {
+              console.log(validate.errors[0]);
+              const { message } = validate.errors[0];
+              error = Errorify.create({
+                status: 400,
+                message
+              });
+            }
+            next(error);
           });
       };
     }

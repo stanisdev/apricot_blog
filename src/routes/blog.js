@@ -3,7 +3,7 @@
 class Blog {
   constructor() {}
 
-  ['PUT /:id | auth <updateById>']({ req, res, db }) {
+  async ['PUT /:id | auth <updateById>']({ req, res, db }) {
     
   }
 }

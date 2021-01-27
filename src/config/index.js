@@ -1,6 +1,7 @@
 'use strict';
 
 const { parse, join } = require('path');
+const glob = require('glob');
 
 const { env } = process;
 const srcDir = parse(__dirname).dir;
@@ -21,6 +22,14 @@ const config = Object.seal({
   http: {
     methods: ['get', 'post', 'put', 'delete']
   },
+  services: glob
+    .sync(join(srcDir, 'services') + '/!(index)*.js')
+    .reduce((prev, file) => {
+      const { name } = parse(file);
+      prev[name] = file;
+
+      return prev;
+    }, {})
 });
 
 module.exports = config;

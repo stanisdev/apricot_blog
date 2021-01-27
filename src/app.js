@@ -2,14 +2,15 @@
 
 const config = require('./config');
 const { port } = config.app;
+const { services, directory } = config;
 global.config = config;
 
 const components = [
-  config.directory.db,
-  config.directory.middlewares,
-  config.directory.services + '/logger.js',
-  config.directory.validators,
-  config.directory.routes,
+  directory.db,
+  directory.middlewares,
+  services.logger,
+  directory.validators,
+  directory.routes,
 ];
 
 async function start() {
@@ -20,7 +21,8 @@ async function start() {
       await component();
     }
   }
-  const app = require(config.directory.services + '/app.js');
+  const app = require(services.app);
+  require(services.errorHandler);
 
   app.listen(port, () => {
     console.log(`The server is listening on port ${port}`);

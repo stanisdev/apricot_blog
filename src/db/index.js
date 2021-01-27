@@ -1,7 +1,7 @@
 'use strict';
 
 const db = require('./models');
-const app = require(global.config.directory.services + '/app.js');
+const app = require(global.config.services.app);
 
 app.set('db', db);
 
