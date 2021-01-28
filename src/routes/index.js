@@ -4,8 +4,8 @@ const { config } = global;
 const app = require(config.services.app);
 const wrapper = require(config.services.wrapper);
 const Errorify = require(config.services.errorify);
+const middlewares = require(config.directory.middlewares);
 
-const middlewares = app.get('middlewares');
 const validators = app.get('validators');
 const { parse } = require('path');
 const glob = require('glob');
@@ -53,24 +53,33 @@ class Route {
     const { Class } = this;
     const fn = Class.prototype[route];
     let handlers = [];
-    
+
     if (route.includes('|')) {
       this.route = route;
-      this.#middleware();
       handlers.push(
-        this.#validators()
+        this.#validators(),
+        this.#middleware()
       );
     }
-    handlers.push(fn);
     handlers = handlers
-      .filter(h => typeof h == 'function')
-      .map(h => {
-        if (h.toString().includes('async ')) {
-          return wrapper(h);
-        }
-        return h;
-      });
+      .flat()
+      .filter(h => typeof h == 'function');
+    handlers.push(fn);
 
+    /**
+     * Wrap each async function by the secure wrapper
+     */
+    const lastIndex = handlers.length - 1;
+
+    handlers = handlers.map((h, index) => {
+      if (h.toString().includes('async ')) {
+        if (index == lastIndex) {
+          return wrapper.routeHandler(h);
+        }
+        return wrapper.middleware(h);
+      }
+      return h;
+    });
     app[this.method](
       this.url,
       handlers
@@ -78,7 +87,7 @@ class Route {
   }
 
   #middleware() {
-    const search = /\|([a-z\d\s,]+)(\<|$)/i.exec(this.route);
+    const search = /\|([a-z\d\s,_]+)(\<|$)/i.exec(this.route);
     if (!Array.isArray(search)) {
       return;
     }
@@ -86,13 +95,24 @@ class Route {
     if (pattern.length < 1) {
       return;
     }
-    let values = [];
+    let names = [];
 
     if (pattern.includes(',')) {
-      values.push(...pattern.split(/\s*,\s*/));
+      names.push(...pattern.split(/\s*,\s*/));
     } else {
-      values.push(pattern);
+      names.push(pattern);
     }
+    return names.map(name => {
+      const middleware = middlewares[name];
+
+      if (typeof middleware !== 'function') {
+        throw new Error(
+          'The middleware ' +
+          `${name} is not defined`
+        );
+      }
+      return middleware;
+    });
   }
 
   #validators() {
@@ -123,7 +143,6 @@ class Route {
         
             let error;
             if (!validate(data)) {
-              console.log(validate.errors[0]);
               const { message } = validate.errors[0];
               error = Errorify.create({
                 status: 400,
