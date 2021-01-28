@@ -13,7 +13,7 @@ const components = [
   directory.routes,
 ];
 
-async function start() {
+async function start(done) {
   for (let a = 0; a < components.length; a++) {
     const component = require(components[a]);
 
@@ -21,12 +21,17 @@ async function start() {
       await component();
     }
   }
+  let server;
   const app = require(services.app);
   require(services.errorHandler);
 
-  app.listen(port, () => {
+  server = app.listen(port, () => {
     console.log(`The server is listening on port ${port}`);
+    done(server);
   });
 }
 
-start();
+module.exports = new Promise(
+  (resolve, reject) =>
+    start(resolve).catch(reject)
+);
