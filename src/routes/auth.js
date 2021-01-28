@@ -5,13 +5,31 @@ class Auth {
     this.prefix = '/auth';
   }
 
-  async ['POST /register | <*>']({ req, res, db, Errorify }) {
-    throw Errorify.create({
-      message: 'Wrong login/password'
+  /**
+   * Register a new user
+   */
+  async ['POST /register | <*>']({
+    body: { email, name, password },
+    Errorify,
+    User
+  }) {
+    const user = User.build({
+      name,
+      email,
+      password
     });
-    res.json({ success: true });
+    if (await User.emailExists(email)) {
+      throw Errorify.create({
+        message: 'Email is already registered'
+      });
+    }
+    await user.encryptPassword();
+    await user.save();
   }
 
+  /**
+   * Login in system
+   */
   async ['POST /login']() {}
 }
 

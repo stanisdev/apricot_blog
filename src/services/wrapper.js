@@ -10,7 +10,6 @@ module.exports = {
       fn({
         db,
         req,
-        res,
         Errorify
       })
         .then(next)
@@ -21,11 +20,19 @@ module.exports = {
     return (req, res, next) => {
       fn({
         db,
-        req,
-        res,
+        body: req.body,
+        User: db.User,
         Errorify
       })
-        .then(data => res.json(data))
+        .then(data => {
+          const result = {
+            success: true
+          };
+          if (data instanceof Object) {
+            result.data = data;
+          }
+          res.json(result);
+        })
         .catch(next);
     };
   }
