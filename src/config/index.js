@@ -1,13 +1,28 @@
 'use strict';
 
 const { parse, join } = require('path');
+const { merge } = require('lodash');
 const glob = require('glob');
 
 const { env } = process;
 const srcDir = parse(__dirname).dir;
-const port = Number.parseInt(env.PORT);
 
-const config = Object.seal({
+const environments = {
+  production: {
+    port: 3000
+  },
+  development: {
+    port: 3001
+  },
+  test: {
+    port: 3002,
+    logger: {
+      level: 'silent'
+    }
+  }
+};
+
+const config = {
   directory: {
     src: srcDir,
     db: join(srcDir, 'db'),
@@ -15,9 +30,6 @@ const config = Object.seal({
     middlewares: join(srcDir, 'middlewares'),
     services: join(srcDir, 'services'),
     validators: join(srcDir, 'validators'),
-  },
-  app: {
-    port: Number.isInteger(port) ? port : 3000,
   },
   http: {
     methods: ['get', 'post', 'put', 'delete']
@@ -29,7 +41,24 @@ const config = Object.seal({
       prev[name] = file;
 
       return prev;
-    }, {})
-});
+    }, {}),
+  logger: {
+    level: 'info',
+    serializers: {
+      req (req) {
+        return {
+          id: Math.random().toString().slice(-4),
+          method: req.method,
+          url: req.url,
+          hostname: req.hostname,
+          remoteAddress: req.ip
+        }
+      },
+      res() {}
+    }
+  }
+};
 
-module.exports = config;
+module.exports = global.config = merge(
+  config, environments[env.NODE_ENV]
+);

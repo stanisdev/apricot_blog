@@ -1,14 +1,12 @@
 'use strict';
 
 const config = require('./config');
-const { port } = config.app;
-const { services, directory } = config;
-global.config = config;
+const { services, directory, port } = config;
+const logger = require(services.logger);
 
 const components = [
   directory.db,
   directory.middlewares,
-  services.logger,
   directory.validators,
   directory.routes,
 ];
@@ -26,7 +24,7 @@ async function start(done) {
   require(services.errorHandler);
 
   server = app.listen(port, () => {
-    console.log(`The server is listening on port ${port}`);
+    logger.info(`The server is listening on port ${port}`);
     done(server);
   });
 }

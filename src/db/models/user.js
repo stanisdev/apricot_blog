@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static associate(models) {}
-  };
+  }
 
   User.init({
     name: {

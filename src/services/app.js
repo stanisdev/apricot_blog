@@ -1,9 +1,8 @@
 'use strict';
 
-const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const app = express();
+const app = require('express')();
 
 app.use(helmet());
 app.use(bodyParser.json());

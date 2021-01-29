@@ -4,7 +4,7 @@ const request = require('supertest');
 const httpStatus = require('http-status');
 const faker = require('faker');
 const getApp = require('../../src/app');
-const db = require('../../src/db/models')
+const db = require('../../src/db/models');
 let server;
 
 describe('Auth routes', () => {
@@ -20,7 +20,7 @@ describe('Auth routes', () => {
   describe('POST /auth/register', () => {
     const newUser = {
       name: faker.name.findName(),
-      email: faker.internet.email().toLowerCase(),
+      email: 'kaden.bosco@hotmail.com',
       password: faker.internet.password()
     };
 
@@ -31,6 +31,13 @@ describe('Auth routes', () => {
         .expect(httpStatus.OK);
 
       expect(body.success).toEqual(true);
+      const user = await db.User.findOne({
+        where: {
+          email: newUser.email
+        }
+      });
+      expect(user.email).toEqual(newUser.email);
+      expect(typeof user.id).toBe('number');
     });
   });
 });

@@ -1,6 +1,15 @@
 'use strict';
 
-const morgan = require('morgan');
+const { config } = global;
+const logger = require('pino')({
+  level: config.logger.level
+});
 
+const httpLogger = require('pino-http')({
+  logger,
+  serializers: config.logger.serializers
+});
 const app = require(global.config.services.app);
-app.use(morgan('tiny'));
+app.use(httpLogger);
+
+module.exports = logger;
