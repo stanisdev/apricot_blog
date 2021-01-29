@@ -3,13 +3,17 @@
 const request = require('supertest');
 const httpStatus = require('http-status');
 const faker = require('faker');
-const getApp = require('../../src/app');
+const App = require('../../src/services/app');
+const config = require('../../src/config');
 const db = require('../../src/db/models');
 let server;
 
 describe('Auth routes', () => {
   beforeAll(async () => {
-    server = await getApp;
+    const app = new App(config);
+    await app.build();
+    await app.listen();
+    server = app.server;
   });
 
   afterAll(async () => {

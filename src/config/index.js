@@ -23,7 +23,7 @@ const environments = {
 };
 
 const config = {
-  directory: {
+  directories: {
     src: srcDir,
     db: join(srcDir, 'db'),
     routes: join(srcDir, 'routes'),

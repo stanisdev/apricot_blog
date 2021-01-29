@@ -1,21 +1,19 @@
 'use strict';
 
-const { config } = global;
-const app = require(config.services.app);
-const wrapper = require(config.services.wrapper);
-const Errorify = require(config.services.errorify);
-const middlewares = require(config.directory.middlewares);
-
-const validators = app.get('validators');
 const { parse } = require('path');
 const glob = require('glob');
+const { services } = global.config;
+const AsyncWrapper = require(services.wrapper);
+const Errorify = require(services.errorify);
 
 const Ajv = require('ajv');
 const ajv = new Ajv();
 
 class Route {
-  constructor() {
+  constructor(app) {
     this.files = glob.sync(__dirname + '/!(index)*.js');
+    this.app = app;
+    this.wrapper = new AsyncWrapper(app);
   }
 
   iterateFiles() {
@@ -74,13 +72,13 @@ class Route {
     handlers = handlers.map((h, index) => {
       if (h.toString().includes('async ')) {
         if (index == lastIndex) {
-          return wrapper.routeHandler(h);
+          return this.wrapper.routeHandler(h);
         }
-        return wrapper.middleware(h);
+        return this.wrapper.middleware(h);
       }
       return h;
     });
-    app[this.method](
+    this.app.instance[this.method](
       this.url,
       handlers
     );
@@ -103,7 +101,7 @@ class Route {
       names.push(pattern);
     }
     return names.map(name => {
-      const middleware = middlewares[name];
+      const middleware = this.app.middlewares[name];
 
       if (typeof middleware !== 'function') {
         throw new Error(
@@ -123,7 +121,7 @@ class Route {
     const validator = search[1];
     if (validator == '*') {
       const url = this.route.split(' ')[1].slice(1);
-      const schemas = validators[this.fileName][url];
+      const schemas = this.app.validators[this.fileName][url];
 
       if (!(schemas instanceof Object)) {
         throw new Error(
@@ -166,4 +164,4 @@ class Route {
   }
 }
 
-new Route().iterateFiles();
+module.exports = Route;
