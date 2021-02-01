@@ -33,6 +33,7 @@ class App {
     new Route(this).iterateFiles();
     this.instance.use(require(services.error));
     this.logger();
+    this.instance.use(require(services[404]));
   }
 
   logger() {
