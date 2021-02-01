@@ -30,6 +30,7 @@ const config = {
     middlewares: join(srcDir, 'middlewares'),
     services: join(srcDir, 'services'),
     validators: join(srcDir, 'validators'),
+    locales: join(srcDir, 'locales'),
   },
   http: {
     methods: ['get', 'post', 'put', 'delete']

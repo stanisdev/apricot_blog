@@ -2,15 +2,14 @@
 
 const httpStatus = require('http-status');
 
-module.exports = (req, res, next) => {
+module.exports = ({ t }, res) => {
   const status = 404;
-  const message = 'Nothing was found';
 
   res
     .status(status)
     .json({
       error: httpStatus[status],
-      message,
+      message: t('app.404'),
       status,
       timestamp: new Date(),
     });

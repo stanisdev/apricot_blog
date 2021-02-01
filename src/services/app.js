@@ -24,16 +24,19 @@ class App {
 
   async build() {
     const { directories, services } = this.config;
+    const { instance } = this;
 
     this.db = await require(directories.db)();
     this.middlewares = require(directories.middlewares);
     this.validators = require(directories.validators);
     const Route = require(directories.routes);
+    const i18next = require(services.i18next);
     
+    instance.use(i18next);
     new Route(this).iterateFiles();
-    this.instance.use(require(services.error));
+    instance.use(require(services.error));
     this.logger();
-    this.instance.use(require(services[404]));
+    instance.use(require(services[404]));
   }
 
   logger() {

@@ -22,6 +22,7 @@ class AsyncWrapper {
     const { db } = this.app;
     return (req, res, next) => {
       fn({
+        req,
         db,
         body: req.body,
         User: db.User,

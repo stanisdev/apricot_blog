@@ -5,8 +5,8 @@ const httpStatus = require('http-status');
 
 module.exports = (error, req, res, next) => {
   let status = 500;
-  let message = 'The server has caught an undefined error';
-  console.log(error);
+  let message = req.t('app.server-error');
+  // @todo: Add logging
 
   if (error instanceof Errorify) {
     status = error.status;

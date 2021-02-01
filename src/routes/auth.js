@@ -11,7 +11,8 @@ class Auth {
   async ['POST /register | <*>']({
     body: { email, name, password },
     Errorify,
-    User
+    User,
+    req,
   }) {
     const user = User.build({
       name,
@@ -20,7 +21,7 @@ class Auth {
     });
     if (await User.emailExists(email)) {
       throw Errorify.create({
-        message: 'Email is already registered'
+        message: req.t('auth.email-registered')
       });
     }
     await user.encryptPassword();

@@ -1,0 +1,9 @@
+{
+  "app": {
+    "404": "Nothing was found",
+    "server-error": "The server has caught an undefined error"
+  },
+  "auth": {
+    "email-registered": "Email is already registered"
+  }
+}
