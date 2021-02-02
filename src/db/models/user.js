@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
       this.password = hash;
     }
 
+    isCorrectPassword(password) {
+      const data = password + this.salt;
+      return bcrypt.compare(data, this.password);
+    }
+
     static async emailExists(email) {
       const user = await User.findOne({
         where: { email },
@@ -24,7 +29,9 @@ module.exports = (sequelize, DataTypes) => {
       return user instanceof Object;
     }
 
-    static associate(models) {}
+    static associate(models) {
+      User.hasMany(models.Token);
+    }
   }
 
   User.init({
@@ -62,7 +69,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     state: {
       type: DataTypes.SMALLINT,
-      defaultValue: 0
+      defaultValue: 0,
+      validate: {
+        min: 0
+      }
     }
   }, {
     sequelize,
