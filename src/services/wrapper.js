@@ -19,14 +19,15 @@ class AsyncWrapper {
   }
 
   routeHandler(fn) {
-    const { db } = this.app;
+    const { db, services } = this.app;
     return (req, res, next) => {
       fn({
         req,
         db,
         body: req.body,
         User: db.User,
-        Errorify
+        Errorify,
+        services
       })
         .then(data => {
           const result = {

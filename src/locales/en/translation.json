@@ -4,6 +4,7 @@
     "server-error": "The server has caught an undefined error"
   },
   "auth": {
-    "email-registered": "Email is already registered"
+    "email-registered": "Email is already registered",
+    "wrong-password": "Wrong email or password"
   }
 }

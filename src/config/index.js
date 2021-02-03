@@ -28,7 +28,6 @@ const config = {
     db: join(srcDir, 'db'),
     routes: join(srcDir, 'routes'),
     middlewares: join(srcDir, 'middlewares'),
-    services: join(srcDir, 'services'),
     validators: join(srcDir, 'validators'),
     locales: join(srcDir, 'locales'),
   },
@@ -57,7 +56,15 @@ const config = {
       },
       res() {}
     }
-  }
+  },
+  jwt: {
+    secret: env.JWT_SECRET || 't52ZHdGZH8WaV37aBVu',
+    expiration: {
+      access: 1000 * 60 * 30, // 30 minutes
+      refresh: 1000 * 60 * 60 * 24 * 30 // 30 days
+    }
+  },
+  constants: require('./constants')
 };
 
 module.exports = global.config = merge(

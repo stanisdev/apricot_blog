@@ -22,6 +22,23 @@ const validators = {
       },
       required: ['name', 'email', 'password']
     }
+  },
+  login: {
+    body: {
+      properties: {
+        email: {
+          type: 'string',
+          format: 'email',
+          maxLength: 50,
+          minLength: 6
+        },
+        password: {
+          type: 'string',
+          minLength: 5
+        }
+      },
+      required: ['email', 'password']
+    }
   }
 };
 

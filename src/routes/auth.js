@@ -1,5 +1,7 @@
 'use strict';
 
+const { strictEqual: equal } = require('assert');
+
 class Auth {
   constructor() {
     this.prefix = '/auth';
@@ -31,7 +33,26 @@ class Auth {
   /**
    * Login in system
    */
-  async ['POST /login']() {}
+  async ['POST /login | <*>']({
+    body: { email, password },
+    Errorify,
+    services,
+    User,
+    req
+  }) {
+    const user = await User.findOne({
+      where: { email },
+      attributes: ['id', 'email', 'salt', 'password']
+    });
+    try {
+      equal(await user.isCorrectPassword(password), true);
+    } catch {
+      throw Errorify.create({
+        message: req.t('auth.wrong-password')
+      });
+    }
+    return services.jwt.getTokens(user.id);
+  }
 }
 
 module.exports = Auth;

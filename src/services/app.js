@@ -8,6 +8,7 @@ const pinoHttp = require('pino-http');
 
 class App {
   instance;
+  services = {};
 
   constructor(config) {
     this.config = config;
@@ -31,7 +32,18 @@ class App {
     this.validators = require(directories.validators);
     const Route = require(directories.routes);
     const i18next = require(services.i18next);
-    
+
+    Object
+      .entries(this.config.services)
+      .filter(([name]) => ['jwt'].includes(name))
+      .forEach(([name, path]) => {
+        const Service = require(path);
+
+        if (Service.toString().startsWith('class ')) {
+          this.services[name] = new Service(this);
+        }
+      });
+
     instance.use(i18next);
     new Route(this).iterateFiles();
     instance.use(require(services.error));

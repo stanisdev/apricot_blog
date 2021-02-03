@@ -127,7 +127,7 @@ class Route {
         throw new Error(
           'The schema for the route ' +
           this.route +
-          'is not defined'
+          ' is not defined'
         );
       }
       return (req, res, next) => {
